@@ -58,10 +58,10 @@ function App() {
   }
 
   function handleClick(){
-    // setCount(count+1);
-    // setCount(count+1);
-    setCount((count)=>count+1);
-    setCount((count)=>count+1);
+    setCount(count+1);
+    setCount(count+1);
+    // setCount((prevState)=>prevState+1);
+    // setCount((prevState)=>prevState+1);
   }
 
   const filteredProduct = products.filter((product)=>{

@@ -39,7 +39,7 @@ function ProductCard({ name, price, category, image }) {
         <button onClick={handleDec}>-</button>
         <span>{quantity}</span>
         <button onClick={function(){handleInc(20)}}>+</button>
-         <button onClick={()=>handleInc(20)}></button>
+         <button onClick={()=>handleInc(20)}>+ arrow</button>
       </div>
     </div>
   );
