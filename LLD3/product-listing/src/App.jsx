@@ -1,7 +1,12 @@
 import "./App.css";
 import ProductList from "./components/ProductList";
+import ProductCard from "./components/ProductCard";
 import Section from "./components/Section";
+import { useState } from "react";
 function App() {
+  const [searchTerm,setSearchTerm] = useState("");
+  const [count,setCount] = useState(0);
+  console.log("App re rendering");
   const products = [
     {
       id: 1,
@@ -45,12 +50,33 @@ function App() {
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTprunAqCBQSvW2KObUDE9JVUVfB5ZwsTvDio9vfaLyPA&s",
   };
 
+  function handleChange(event){
+    // console.log(event.target.value);
+    // searchTerm = event.target.value;
+    setSearchTerm(event.target.value); 
+    console.log("Search Term : ", searchTerm);
+  }
+
+  function handleClick(){
+    // setCount(count+1);
+    // setCount(count+1);
+    setCount((count)=>count+1);
+    setCount((count)=>count+1);
+  }
+
+  const filteredProduct = products.filter((product)=>{
+    return product.name.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase());
+  })
+
   return (
     <div>
       <h1>Our Product Listing</h1>
+      <button onClick={handleClick}>+</button>
+      <h2>{count}</h2>
       <input
         type="search"
         placeholder="Search Products..."
+        onChange={handleChange}
         style={{
           padding: "10px",
           fontSize: "16px",
@@ -63,11 +89,11 @@ function App() {
         price={599}
         category="Electronoc"
         image="asd"
-      /> */}
-      {/* <ProductCard {...product1} /> */}
-      {/* <ProductCard {...product2} /> */}
+      />
+      <ProductCard {...product1} />
+      <ProductCard {...product2} /> */}
       <Section title="Featured Products">
-        <ProductList products={products} />
+        <ProductList products={filteredProduct} />
       </Section>
       <Section title="About Us">
         <p>We sell the best tech accesories at affordable prices</p>
@@ -77,3 +103,5 @@ function App() {
 }
 
 export default App;
+
+// input.addEventListener('change',cb)
