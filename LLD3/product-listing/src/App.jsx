@@ -18,7 +18,7 @@ function App() {
 
   // useEffect(cb,[])
   useEffect(()=>{
-    console.log("Inside useEffect")
+    // console.log("Inside useEffect")
     setTimeout(()=>{
       setLoading(false)
     },2000);
