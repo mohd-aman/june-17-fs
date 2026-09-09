@@ -3,10 +3,15 @@ import ProductList from "./components/ProductList";
 import ProductCard from "./components/ProductCard";
 import Section from "./components/Section";
 import { useState } from "react";
+import OrderForm from "./components/OrderForm";
 function App() {
   const [searchTerm,setSearchTerm] = useState("");
   const [count,setCount] = useState(0);
-  console.log("App re rendering");
+
+  const onAddToCart = (quantity)=>{
+    setCount(count+quantity);
+  }
+
   const products = [
     {
       id: 1,
@@ -71,8 +76,7 @@ function App() {
   return (
     <div>
       <h1>Our Product Listing</h1>
-      <button onClick={handleClick}>+</button>
-      <h2>{count}</h2>
+      <h2>In Cart : {count}</h2>
       <input
         type="search"
         placeholder="Search Products..."
@@ -93,8 +97,9 @@ function App() {
       <ProductCard {...product1} />
       <ProductCard {...product2} /> */}
       <Section title="Featured Products">
-        <ProductList products={filteredProduct} />
+        <ProductList products={filteredProduct} onAddToCart={onAddToCart} />
       </Section>
+      <OrderForm/>
       <Section title="About Us">
         <p>We sell the best tech accesories at affordable prices</p>
       </Section>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function ProductCard({ name, price, category, image }) {
+function ProductCard({ name, price, category, image, onAddToCart }) {
   //   console.log(product);
   //   const { name, price, category, image } = product;
   //   console.log(props);
@@ -21,6 +21,11 @@ function ProductCard({ name, price, category, image }) {
     setIsFav(!isFav);
   }
 
+  function handleAddToCart(){
+    onAddToCart(quantity);
+    setQuantity(0);
+  }
+
   return (
     <div
       style={{
@@ -38,8 +43,8 @@ function ProductCard({ name, price, category, image }) {
       <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "10px" }}>
         <button onClick={handleDec}>-</button>
         <span>{quantity}</span>
-        <button onClick={function(){handleInc(20)}}>+</button>
-         <button onClick={()=>handleInc(20)}>+ arrow</button>
+        <button onClick={function(){handleInc(1)}}>+</button>
+        <button onClick={handleAddToCart}>Add to Cart</button>
       </div>
     </div>
   );
