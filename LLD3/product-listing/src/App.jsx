@@ -1,65 +1,43 @@
 import "./App.css";
 import ProductList from "./components/ProductList";
 import ProductCard from "./components/ProductCard";
+import products from "./data/products";
 import Section from "./components/Section";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import OrderForm from "./components/OrderForm";
 function App() {
+  console.log("App rendering");
   const [searchTerm,setSearchTerm] = useState("");
   const [count,setCount] = useState(0);
+
+  const [loading,setLoading] = useState(true);
 
   const onAddToCart = (quantity)=>{
     setCount(count+quantity);
   }
 
-  const products = [
-    {
-      id: 1,
-      name: "Wireless mouse",
-      price: 599,
-      category: "Electronics",
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRACyXw5N7dX3aM-YGIcMjVULufbfQMLTstN-4Y9hjGDw&s=10",
-    },
-    {
-      id: 2,
-      name: "Wireless keyboard",
-      price: 1599,
-      category: "Electronics",
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTprunAqCBQSvW2KObUDE9JVUVfB5ZwsTvDio9vfaLyPA&s",
-    },
-    {
-      id: 3,
-      name: "Laptop Stand",
-      price: 2499,
-      category: "Electronics",
-      image:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdyaiA0QntxjUwRL0azD-KKueFOxki01ch_T1zKPOcrQ&s=10",
-    },
-  ];
-  const product1 = {
-    id: 1,
-    name: "Wireless mouse",
-    price: 599,
-    category: "Electronics",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRACyXw5N7dX3aM-YGIcMjVULufbfQMLTstN-4Y9hjGDw&s=10",
-  };
-  const product2 = {
-    id: 1,
-    name: "Wireless keyboard",
-    price: 1599,
-    category: "Electronics",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTprunAqCBQSvW2KObUDE9JVUVfB5ZwsTvDio9vfaLyPA&s",
-  };
+  // useEffect(cb,[])
+  useEffect(()=>{
+    console.log("Inside useEffect")
+    setTimeout(()=>{
+      setLoading(false)
+    },2000);
+  },[]); // cb will be invoked once, on mount.
+
+  useEffect(function(){
+    console.log("useEffect without dependency array");
+  }) // no dependency array passed at all, it will execute cb on every re render.
+
+
+  useEffect(function(){
+    console.log("Cart updated : ", count);
+  },[count])
 
   function handleChange(event){
     // console.log(event.target.value);
     // searchTerm = event.target.value;
     setSearchTerm(event.target.value); 
-    console.log("Search Term : ", searchTerm);
+    // console.log("Search Term : ", searchTerm);
   }
 
   function handleClick(){
@@ -72,6 +50,10 @@ function App() {
   const filteredProduct = products.filter((product)=>{
     return product.name.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase());
   })
+
+  if(loading){
+    return <h1>Loading......</h1>
+  }
 
   return (
     <div>

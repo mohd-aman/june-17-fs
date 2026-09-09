@@ -4,7 +4,7 @@ function ProductCard({ name, price, category, image, onAddToCart }) {
   //   console.log(product);
   //   const { name, price, category, image } = product;
   //   console.log(props);
-  console.log("Re rendering")
+  // console.log("Re rendering")
   const [quantity,setQuantity] = useState(0);
   const [isFav,setIsFav] = useState(false);
 
