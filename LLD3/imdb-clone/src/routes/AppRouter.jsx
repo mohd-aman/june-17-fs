@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import RootLayout from "../components/layout/RootLayout";
 //without lazy loading
 import HomePage from "../features/home/HomePage";
+import Loader from "../components/ui/Loader";
 // import WatchListPage from "../features/watchlist/WatchList";
 // import MovieDetailPage from "../features/movie-detail/MovieDetailPage";
 // import NotFound from "../components/ui/NotFound";
@@ -26,7 +27,7 @@ const NotFound = lazy(()=>(
 
 function AppRouter(){
 return(
-  <Suspense fallback={<div>Loading....</div>}>
+  <Suspense fallback={<Loader fullScreen/>}>
     <Routes>
       <Route element={<RootLayout/>}>
         <Route element={<HomePage/>} path="/"/>
