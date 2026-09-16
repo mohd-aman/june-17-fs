@@ -9,12 +9,11 @@ export default function Banner(){
 
   useEffect(()=>{
     movieService.getPopular().then((data)=>{
-      console.log(data.results);
+      // console.log(data.results);
       const movies = data.results;
       const randomMovie = movies[Math.floor(Math.random() * movies.length)]
       setMovie(randomMovie);
     })
-
   },[]) //it will execute effect only on mounting(once)
   
   if(!movie){

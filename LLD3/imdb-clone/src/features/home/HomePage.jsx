@@ -1,10 +1,11 @@
 import Banner from "./Banner";
+import Movies from "./Movies";
 
 function HomePage() {
   return (
     <div className="text-white text-center">
       <Banner/>
-      <p className="text-gray-400 mt-4">Movies will appear here</p>
+      <Movies/>
     </div>
   );
 }

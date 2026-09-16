@@ -7,7 +7,7 @@ const movieService = {
   getTrending(page=1){
     return api.get("/movie/trending/week",{params:{page}})
   },
-  search(query,page=1){
+  getSearch(query,page=1){
      return api.get("/search/movie", { params: { query, page } });
   },
   getById(movieId){
