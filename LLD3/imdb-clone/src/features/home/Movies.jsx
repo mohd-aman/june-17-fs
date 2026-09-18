@@ -4,7 +4,11 @@ import MovieCard from "./MovieCard";
 import movieService from "../../services/movieService";
 import ErrorMessage from "../../components/ui/ErrorMessage";
 
-export default function Movies() {
+export default function Movies({
+  addToWatchlist,
+  removeFromWatchlist,
+  isInWatchlist,
+}) {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -42,15 +46,15 @@ export default function Movies() {
       }
     }
     fetchMovies();
-  }, [currentPage, search]);
+  }, [currentPage, search]); // it run on mount, change on currentPage/search
 
   if (error) {
     return <ErrorMessage message={error} />;
   }
 
-  if (loading) {
-    return <Loader />;
-  }
+  // if (loading) {
+  //   return <Loader />;
+  // }
 
   return (
     <div className="p-6">
@@ -70,11 +74,21 @@ export default function Movies() {
         <p className="text-center text-gray-400 text-xl">No movies found.</p>
       ) : (
         <>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            {movies.map((movie) => (
-              <MovieCard key={movie.id} movie={movie} />
-            ))}
-          </div>
+          {loading ? (
+            <Loader />
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+              {movies.map((movie) => (
+                <MovieCard
+                  key={movie.id}
+                  movie={movie}
+                  addToWatchlist={addToWatchlist}
+                  removeFromWatchlist={removeFromWatchlist}
+                  isInWatchlist={isInWatchlist}
+                />
+              ))}
+            </div>
+          )}
           <div className="flex justify-center items-center gap-6 mt-10">
             <button
               className="px-5 py-2 bg-yellow-500 text-black font-bold rounded-lg hover:bg-yellow-400 disabled:bg-gray-600 disabled:text-gray-400 disabled:cursor-not-allowed transition"
