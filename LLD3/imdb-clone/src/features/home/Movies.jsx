@@ -3,13 +3,16 @@ import Loader from "../../components/ui/Loader";
 import MovieCard from "./MovieCard";
 import movieService from "../../services/movieService";
 import ErrorMessage from "../../components/ui/ErrorMessage";
+import MovieCardShimmer from "../../components/ui/MovieCardShimmer";
+
+const shimmerMovies = Array.from({ length: 20 }, () => 1);
 
 export default function Movies({
   addToWatchlist,
   removeFromWatchlist,
   isInWatchlist,
 }) {
-  const [movies, setMovies] = useState([]);
+  const [movies, setMovies] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -70,12 +73,18 @@ export default function Movies({
       <h2 className="text-white text-3xl font-bold text-center mb-8">
         {search.trim() ? `Results for "${search}"` : "Popular Movies"}
       </h2>
-      {movies.length === 0 ? (
+      {movies?.length === 0 ? (
         <p className="text-center text-gray-400 text-xl">No movies found.</p>
       ) : (
         <>
           {loading ? (
-            <Loader />
+            <>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+              {shimmerMovies.map((shim,index) => {
+                return <MovieCardShimmer key={index}/>;
+              })}
+            </div>
+            </>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
               {movies.map((movie) => (
