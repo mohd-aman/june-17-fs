@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import movieService from "../../services/movieService";
 import Loader from "../../components/ui/Loader";
+import MovieCardShimmer from '../../components/ui/MovieCardShimmer'
 
 const IMAGE_BASE = import.meta.env.VITE_TMDB_IMAGE_BASE;
 
@@ -17,7 +18,7 @@ export default function Banner(){
   },[]) //it will execute effect only on mounting(once)
   
   if(!movie){
-    return <Loader/>
+    return <MovieCardShimmer height={"h-[30vh] md:h-[75vh]"}/>
   }
 
   return (
