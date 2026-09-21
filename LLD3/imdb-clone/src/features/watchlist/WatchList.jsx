@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import aiService from "../../services/aiService";
+
 const IMAGE_BASE = import.meta.env.VITE_TMDB_IMAGE_BASE;
 const GENRE_MAP = {
   28: "Action",
@@ -14,13 +16,25 @@ const GENRE_MAP = {
   878: "Sci-Fi",
   53: "Thriller",
 };
-function WatchListPage({
-  watchlist,
-  removeFromWatchlist,
-}) {
-  const [search,setSearch] = useState("");
-  const [sortBy,setSortBy] = useState("none");
-  const [genreFilter,setGenreFilter] = useState("all");
+function WatchListPage({ watchlist, removeFromWatchlist }) {
+  const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState("none");
+  const [genreFilter, setGenreFilter] = useState("all");
+  const [aiRecommendation, setAiRecommendation] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+
+  async function handleAskAI() {
+    try {
+      setAiLoading(true);
+      setAiRecommendation("");
+      const result = await aiService.getRecommendation(watchlist);
+      setAiRecommendation(result);
+    } catch (error) {
+      setAiRecommendation("Something went wrong. Please try again.");
+    } finally {
+      setAiLoading(false);
+    }
+  }
 
   if (watchlist.length === 0) {
     return (
@@ -28,7 +42,10 @@ function WatchListPage({
         <h1 className="text-3xl font-bold text-gray-400">
           Your watchlist is empty
         </h1>
-        <Link className="px-6 py-2 bg-yellow-500 text-black font-bold rounded-lg hover:bg-yellow-400 transition" to="/">
+        <Link
+          className="px-6 py-2 bg-yellow-500 text-black font-bold rounded-lg hover:bg-yellow-400 transition"
+          to="/"
+        >
           Browse Movies
         </Link>
       </div>
@@ -37,25 +54,25 @@ function WatchListPage({
 
   //filtering based on search
   let filteredMovies = watchlist.filter((movie) =>
-    movie.title.toLowerCase().includes(search.toLowerCase())
+    movie.title.toLowerCase().includes(search.toLowerCase()),
   );
 
   //sorting on filtered Arr.
   if (sortBy === "rating-high") {
     filteredMovies = [...filteredMovies].sort(
-      (a, b) => b.vote_average - a.vote_average
+      (a, b) => b.vote_average - a.vote_average,
     );
   } else if (sortBy === "rating-low") {
     filteredMovies = [...filteredMovies].sort(
-      (a, b) => a.vote_average - b.vote_average
+      (a, b) => a.vote_average - b.vote_average,
     );
   } else if (sortBy === "title-az") {
     filteredMovies = [...filteredMovies].sort((a, b) =>
-      a.title.localeCompare(b.title)
+      a.title.localeCompare(b.title),
     );
   } else if (sortBy === "title-za") {
     filteredMovies = [...filteredMovies].sort((a, b) =>
-      b.title.localeCompare(a.title)
+      b.title.localeCompare(a.title),
     );
   }
 
@@ -63,8 +80,7 @@ function WatchListPage({
   if (genreFilter !== "all") {
     filteredMovies = filteredMovies.filter(
       (movie) =>
-        movie.genre_ids &&
-        movie.genre_ids.includes(Number(genreFilter))
+        movie.genre_ids && movie.genre_ids.includes(Number(genreFilter)),
     );
   }
 
@@ -105,6 +121,25 @@ function WatchListPage({
             </option>
           ))}
         </select>
+      </div>
+            <div className="max-w-4xl mx-auto mb-6">
+        <button
+          className="px-6 py-3 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={aiLoading}
+          onClick={handleAskAI}
+        >
+          {aiLoading ? "Thinking..." : "🤖 Ask AI for Recommendations"}
+        </button>
+        {aiRecommendation && (
+          <div className="mt-4 p-5 bg-gray-800 rounded-xl border border-purple-500/30">
+            <h3 className="text-purple-400 font-bold mb-3">
+              AI Recommendations
+            </h3>
+            <p className="text-gray-300 whitespace-pre-line leading-relaxed">
+              {aiRecommendation}
+            </p>
+          </div>
+        )}
       </div>
       <div className="max-w-4xl mx-auto">
         {filteredMovies.map((movie) => {
