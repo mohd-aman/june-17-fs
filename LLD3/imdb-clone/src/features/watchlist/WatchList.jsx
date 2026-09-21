@@ -1,12 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 const IMAGE_BASE = import.meta.env.VITE_TMDB_IMAGE_BASE;
+const GENRE_MAP = {
+  28: "Action",
+  12: "Adventure",
+  16: "Animation",
+  35: "Comedy",
+  80: "Crime",
+  18: "Drama",
+  14: "Fantasy",
+  27: "Horror",
+  10749: "Romance",
+  878: "Sci-Fi",
+  53: "Thriller",
+};
 function WatchListPage({
   watchlist,
   removeFromWatchlist,
 }) {
   const [search,setSearch] = useState("");
   const [sortBy,setSortBy] = useState("none");
+  const [genreFilter,setGenreFilter] = useState("all");
 
   if (watchlist.length === 0) {
     return (
@@ -45,6 +59,14 @@ function WatchListPage({
     );
   }
 
+  //filter by genre
+  if (genreFilter !== "all") {
+    filteredMovies = filteredMovies.filter(
+      (movie) =>
+        movie.genre_ids &&
+        movie.genre_ids.includes(Number(genreFilter))
+    );
+  }
 
   return (
     <div className="p-8">
@@ -69,6 +91,19 @@ function WatchListPage({
           <option value="rating-low">Rating: Low to High</option>
           <option value="title-az">Title: A to Z</option>
           <option value="title-za">Title: Z to A</option>
+        </select>
+
+        <select
+          className="px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:outline-none focus:border-yellow-400"
+          onChange={(e) => setGenreFilter(e.target.value)}
+          value={genreFilter}
+        >
+          <option value="all">All Genres</option>
+          {Object.entries(GENRE_MAP).map(([id, name]) => (
+            <option key={id} value={id}>
+              {name}
+            </option>
+          ))}
         </select>
       </div>
       <div className="max-w-4xl mx-auto">
