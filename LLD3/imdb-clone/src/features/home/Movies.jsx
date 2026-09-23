@@ -7,11 +7,7 @@ import MovieCardShimmer from "../../components/ui/MovieCardShimmer";
 
 const shimmerMovies = Array.from({ length: 20 }, () => 1);
 
-export default function Movies({
-  addToWatchlist,
-  removeFromWatchlist,
-  isInWatchlist,
-}) {
+export default function Movies() {
   const [movies, setMovies] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -91,9 +87,6 @@ export default function Movies({
                 <MovieCard
                   key={movie.id}
                   movie={movie}
-                  addToWatchlist={addToWatchlist}
-                  removeFromWatchlist={removeFromWatchlist}
-                  isInWatchlist={isInWatchlist}
                 />
               ))}
             </div>

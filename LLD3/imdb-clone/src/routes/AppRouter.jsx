@@ -21,33 +21,6 @@ const WatchListPage = lazy(() => import("../features/watchlist/WatchList"));
 const NotFound = lazy(() => import("../components/ui/NotFound"));
 
 function AppRouter() {
-  const [watchlist, setWatchlist] = useState(()=>{
-    try{
-      const saved = localStorage.getItem('watchlist');
-      return saved ? JSON.parse(saved): []
-    }catch{
-      return []
-    }
-  });
-
-  useEffect(()=>{
-    localStorage.setItem('watchlist',JSON.stringify(watchlist));
-  },[watchlist])
-
-  function addToWatchlist(movie) {
-    setWatchlist((prev) => {
-      return [...prev, movie];
-    });
-  }
-
-  function removeFromWatchlist(movieId) {
-    setWatchlist((prev) => prev.filter((m) => m.id !== movieId));
-  }
-
-  function isInWatchlist(movieId) {
-    return watchlist.some((m) => m.id === movieId);
-  }
-
   return (
     <Suspense fallback={<Loader fullScreen />}>
       <Routes>
@@ -55,9 +28,6 @@ function AppRouter() {
           <Route
             element={
               <HomePage
-                addToWatchlist={addToWatchlist}
-                removeFromWatchlist={removeFromWatchlist}
-                isInWatchlist={isInWatchlist}
               />
             }
             path="/"
@@ -65,8 +35,6 @@ function AppRouter() {
           <Route
             element={
               <WatchListPage
-                watchlist={watchlist}
-                removeFromWatchlist={removeFromWatchlist}
               />
             }
             path="/watchlist"

@@ -1,24 +1,21 @@
 import { Link } from "react-router-dom";
+import { useWatchlist } from "../../context/WatchlistContext";
 
 const IMAGE_BASE = import.meta.env.VITE_TMDB_IMAGE_BASE;
 
-function MovieCard({
-  movie,
-  addToWatchlist,
-  removeFromWatchlist,
-  isInWatchlist,
-}) {
+function MovieCard({ movie }) {
+  const { addToWatchlist, removeFromWatchlist, isInWatchlist } = useWatchlist();
   const posterUrl = movie.poster_path
     ? `${IMAGE_BASE}/w500${movie.poster_path}`
     : "[https://via.placeholder.com/500x750?text=No+Image](https://via.placeholder.com/500x750?text=No+Image)";
 
-  const inList = isInWatchlist(movie.id)  
+  const inList = isInWatchlist(movie.id);
   function handleToggle(e) {
     e.preventDefault();
-    if(inList){
-      removeFromWatchlist(movie.id)
-    }else{
-      addToWatchlist(movie)
+    if (inList) {
+      removeFromWatchlist(movie.id);
+    } else {
+      addToWatchlist(movie);
     }
   }
   return (
@@ -39,7 +36,7 @@ function MovieCard({
             <span className="text-gray-300 text-sm">{movie.release_date}</span>
           </div>
         </div>
-         <button
+        <button
           onClick={handleToggle}
           className="absolute top-2 right-2 z-10 text-2xl bg-black/50 rounded-full w-9 h-9 flex items-center justify-center hover:bg-black/80 transition"
         >

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import aiService from "../../services/aiService";
+import { useWatchlist } from "../../context/WatchlistContext";
 
 const IMAGE_BASE = import.meta.env.VITE_TMDB_IMAGE_BASE;
 const GENRE_MAP = {
@@ -16,12 +17,14 @@ const GENRE_MAP = {
   878: "Sci-Fi",
   53: "Thriller",
 };
-function WatchListPage({ watchlist, removeFromWatchlist }) {
+function WatchListPage() {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("none");
   const [genreFilter, setGenreFilter] = useState("all");
   const [aiRecommendation, setAiRecommendation] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
+
+  const { watchlist, removeFromWatchlist } = useWatchlist();
 
   async function handleAskAI() {
     try {
