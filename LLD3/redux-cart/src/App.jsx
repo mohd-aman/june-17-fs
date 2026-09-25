@@ -1,7 +1,15 @@
+import { Routes, Route } from "react-router-dom";
+import NavBar from "./components/Navbar";
+import ProductList from "./features/products/ProductList";
+
 function App() {
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <h1 className="text-3xl font-bold text-center py-10">Redux Cart</h1>
+    <div className="min-h-screen bg-gray-950">
+      <NavBar/>
+      <Routes>
+        <Route element={<ProductList />} path="/" />
+        <Route className="text-white p-8 text-center text-xl" element={<div >Cart page coming next class!</div>}  path="/cart"/>
+      </Routes>
     </div>
   );
 }
