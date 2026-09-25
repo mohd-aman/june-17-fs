@@ -20,10 +20,10 @@ function NavBar() {
           Redux Cart
         </NavLink>
         <div className="flex gap-6 items-center">
-          <NavLink className="{linkClass}" to="/">
+          <NavLink className={linkClass} to="/">
             Products
           </NavLink>
-          <NavLink className="{linkClass}" to="/cart">
+          <NavLink className={linkClass} to="/cart">
             Cart
             {totalQuantity > 0 && (
               <span className="ml-2 bg-yellow-500 text-black text-xs font-bold px-2 py-0.5 rounded-full">
