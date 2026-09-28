@@ -8,7 +8,7 @@ function ProductCard({ product }) {
     <div className="bg-gray-900 rounded-xl overflow-hidden shadow-lg flex flex-col h-full">
       <div className="bg-white p-6 flex items-center justify-center h-56">
         <img
-          src={product.image}
+          src={product.thumbnail}
           alt={product.title}
           className="max-h-full max-w-full object-contain"
         />
@@ -19,10 +19,10 @@ function ProductCard({ product }) {
         </h3>
         <div className="flex items-center gap-2 mb-2">
           <span className="text-yellow-400 text-sm">
-            {product.rating.rate}
+            {product.rating}
           </span>
           <span className="text-gray-500 text-xs">
-            ({product.rating.count})
+            ({product.reviews.length})
           </span>
         </div>
         <p className="text-gray-400 text-xs line-clamp-3 mb-4 flex-1">

@@ -5,15 +5,15 @@ import ProductCard from "./ProductCard";
 
 function ProductList() {
   const dispatch = useDispatch();
-  const { items: products, loading, error } = useSelector(
+  const { items, loading, error } = useSelector(
     (state) => state.products // products slice state
   );
 
   useEffect(() => {
     dispatch(fetchProducts()); //dispatching the thunk
-  }, []); // on mount
+  }, [dispatch]); // on mount
 
-  if (loading) {
+  if (loading || !items.products) {
     return (
       <p className="text-center text-gray-400 text-xl mt-20">
         Loading products...
@@ -26,6 +26,8 @@ function ProductList() {
       <p className="text-center text-red-500 text-xl mt-20">{error}</p>
     );
   }
+
+  const products = items.products
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-8">

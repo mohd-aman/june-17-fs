@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import NavBar from "./components/Navbar";
 import ProductList from "./features/products/ProductList";
+import CartPage from "./features/cart/CartPage";
 
 function App() {
   return (
@@ -8,7 +9,7 @@ function App() {
       <NavBar/>
       <Routes>
         <Route element={<ProductList />} path="/" />
-        <Route className="text-white p-8 text-center text-xl" element={<div >Cart page coming next class!</div>}  path="/cart"/>
+        <Route element={<CartPage/>}  path="/cart"/>
       </Routes>
     </div>
   );
