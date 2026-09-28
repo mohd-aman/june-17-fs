@@ -1,12 +1,9 @@
 import { NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { selectCartTotalQuantity } from "../store/cartSlice";
 
 function NavBar() {
-  const cartItems = useSelector((state) => state.cart.items);
-  const totalQuantity = cartItems.reduce(
-    (total, item) => total + item.quantity,
-    0
-  );
+  const totalQuantity = useSelector(selectCartTotalQuantity);
 
   const linkClass = ({ isActive }) =>
     isActive

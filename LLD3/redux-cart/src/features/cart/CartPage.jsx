@@ -5,10 +5,13 @@ import {
   incrementQuantity,
   decrementQuantity,
   removeFromCart,
+  selectCartItems,
+  selectCartTotalPrice,
 } from "../../store/cartSlice";
 
 export default function CartPage() {
-  const { items: cartItems } = useSelector((state) => state.cart);
+  const cartItems = useSelector(selectCartItems);
+  const cartTotal = useSelector(selectCartTotalPrice)
   const dispatch = useDispatch();
 
   if (cartItems.length === 0) {
@@ -24,11 +27,6 @@ export default function CartPage() {
       </div>
     );
   }
-
-  const cartTotal = cartItems.reduce(
-    (total, item) => item.price * item.quantity + total,
-    0,
-  );
 
   return (
     <div className="max-w-4xl mx-auto p-8">

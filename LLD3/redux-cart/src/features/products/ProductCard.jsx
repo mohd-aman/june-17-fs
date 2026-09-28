@@ -1,7 +1,14 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../../store/cartSlice";
 
 function ProductCard({ product }) {
+  const quantity = useSelector((state)=>{
+  const item = state.cart.items.find((item)=>item.id===product.id)
+  if(item){
+    return item.quantity;
+  }
+  return 0;
+});
   const dispatch = useDispatch();
 
   return (
@@ -18,9 +25,7 @@ function ProductCard({ product }) {
           {product.title}
         </h3>
         <div className="flex items-center gap-2 mb-2">
-          <span className="text-yellow-400 text-sm">
-            {product.rating}
-          </span>
+          <span className="text-yellow-400 text-sm">{product.rating}</span>
           <span className="text-gray-500 text-xs">
             ({product.reviews.length})
           </span>
@@ -34,9 +39,13 @@ function ProductCard({ product }) {
           </span>
           <button
             onClick={() => dispatch(addToCart(product))}
-            className="px-4 py-2 bg-yellow-500 text-black font-bold rounded-lg hover:bg-yellow-400 transition text-sm"
+            className={`px-4 py-2 font-bold rounded-lg transition text-sm ${
+              quantity > 0
+                ? "bg-green-600 text-white hover:bg-green-500"
+                : "bg-yellow-500 text-black hover:bg-yellow-400"
+            }`}
           >
-            Add to Cart
+            {quantity > 0 ? `In cart ${quantity}` : "Add to Cart"}
           </button>
         </div>
       </div>

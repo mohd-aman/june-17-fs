@@ -32,9 +32,7 @@ export default function Movies() {
       try {
         setLoading(true);
         setError(null);
-        const data = search.trim()
-          ? await movieService.getSearch(search, currentPage)
-          : await movieService.getPopular(currentPage);
+        const data = await movieService.getPopular(currentPage);
         if (data) {
           setMovies(data.results);
         }
@@ -45,7 +43,23 @@ export default function Movies() {
       }
     }
     fetchMovies();
-  }, [currentPage, search]); // it run on mount, change on currentPage/search
+  }, [currentPage]); // it run on mount, change on currentPage/search
+
+  useEffect(() => {
+    async function fetchMovie() {
+      const data = await movieService.getSearch(search.trim(), currentPage);
+      if (data) {
+        setMovies(data.results);
+      }
+    }
+    const timerId = setTimeout(() => {
+      fetchMovie();
+    }, 1000);
+
+    return ()=>{
+      clearTimeout(timerId);
+    }
+  }, [search]);
 
   if (error) {
     return <ErrorMessage message={error} />;
@@ -75,19 +89,16 @@ export default function Movies() {
         <>
           {loading ? (
             <>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-              {shimmerMovies.map((shim,index) => {
-                return <MovieCardShimmer key={index}/>;
-              })}
-            </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                {shimmerMovies.map((shim, index) => {
+                  return <MovieCardShimmer key={index} />;
+                })}
+              </div>
             </>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
               {movies.map((movie) => (
-                <MovieCard
-                  key={movie.id}
-                  movie={movie}
-                />
+                <MovieCard key={movie.id} movie={movie} />
               ))}
             </div>
           )}
