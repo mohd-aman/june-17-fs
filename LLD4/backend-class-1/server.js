@@ -19,7 +19,7 @@ let items = [
 app.use(express.json());
 
 app.get('/health',(req,res)=>{
-  res.json({
+  res.status(200).json({
     success:true,
     message:"Server is Health"
   });
@@ -36,12 +36,25 @@ app.get('/items',(req,res)=>{
 app.post('/items/add',(req,res)=>{
   console.log(req.body);
   const newItem = req.body;
+  if(!newItem || !newItem.name){
+    return res.status(400).json({
+      success:false,
+      message:"Item name is missing"
+    })
+  }
   items.push(newItem);
-  res.json({
+  res.status(201).json({
     success:true,
     data:newItem,
     message:"Item added"
   });
+})
+
+app.use((req,res)=>{
+  res.status(404).json({
+    success:false,
+    message:"Route not found"
+  })
 })
 
 app.listen(PORT,()=>{
