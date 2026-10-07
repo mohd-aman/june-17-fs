@@ -1,14 +1,10 @@
 const express = require("express");
+const connectDB = require("./config/db");
+const Item = require("./models/itemModel");
 
 const app = express();
 
 const PORT = 3000;
-
-//in-memory data store
-let items = [
-  { id: 1, name: "Item One" },
-  { id: 2, name: "Item Two" },
-];
 
 //Apply this middleware to every incoming request,
 // express.json() is a built-in middleware that:
@@ -25,67 +21,95 @@ app.get("/health", (req, res) => {
   });
 });
 
-app.get("/items", (req, res) => {
-  res.json({
-    success: true,
-    data: items,
-    message: "Data Retrieved success",
-  });
-});
-
-app.post("/items/add", (req, res) => {
-  console.log(req.body);
-  const newItem = req.body;
-  if (!newItem || !newItem.name) {
-    return res.status(400).json({
+app.get("/items", async (req, res) => {
+  try {
+    const allItems = await Item.find();
+    res.json({
+      success: true,
+      data: allItems,
+      message: "Data Retrieved success",
+    });
+  } catch (err) {
+    res.status(500).json({
       success: false,
-      message: "Item name is missing",
+      message: "Something went wrong",
     });
   }
-  items.push(newItem);
-  res.status(201).json({
-    success: true,
-    data: newItem,
-    message: "Item added",
-  });
+});
+
+app.post("/items/add", async (req, res) => {
+  try {
+    const { name } = req.body;
+    if (!name) {
+      return res.status(400).json({
+        success: false,
+        message: "Item name is missing",
+      });
+    }
+    const newItem = await Item.create({ name });
+    res.status(201).json({
+      success: true,
+      data: newItem,
+      message: "Item added",
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    });
+  }
 });
 
 //route params - /items/:id
-app.put("/items/:id", (req, res) => {
-  const id = parseInt(req.params.id); // string converting to int
-  const updatedData = req.body;
-  const index = items.findIndex((item) => item.id === id);
-  if (index === -1) {
-    return res.status(404).json({
+app.put("/items/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name } = req.body;
+    const updatedItem = await Item.findByIdAndUpdate(
+      id,
+      { name }, // value to update
+      { new: true }, // return updated value
+    );
+    if (!updatedItem) {
+      return res.status(404).json({
+        success: false,
+        message: "Item not found",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: "Item updated successfully",
+      data: updatedItem,
+    });
+  } catch (err) {
+    res.status(500).json({
       success: false,
-      message: "Item not found",
+      message: "Something went wrong",
     });
   }
-
-  items[index] = updatedData;
-  res.status(200).json({
-    success: true,
-    message: "Item Updated",
-    data: updatedData,
-  });
 });
 
-app.delete("/items/:id", (req, res) => {
-  const id = parseInt(req.params.id);
-  const index = items.findIndex((item) => item.id === id);
-  if (index === -1) {
-    return res.status(404).json({
+app.delete("/items/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedItem = await Item.findByIdAndDelete(id);
+    if (!deletedItem) {
+      return res.status(404).json({
+        success: false,
+        message: "Item not found",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: "Item deleted successfully",
+      data: deletedItem,
+    });
+  } catch (err) {
+    res.status(500).json({
       success: false,
-      message: "Item not found",
+      message: "Something went wrong",
     });
   }
-
-  const deletedItem = items.splice(index,1)[0] // three thing in single line
-  res.status(200).json({
-    success:true,
-    message:"Item Deleted",
-    data:deletedItem
-  })
 });
 
 app.use((req, res) => {
@@ -95,6 +119,8 @@ app.use((req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log("SERVER is running on PORT : ", PORT);
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log("SERVER is running on PORT : ", PORT);
+  });
 });
