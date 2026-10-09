@@ -1,6 +1,7 @@
 const express = require("express");
 const connectDB = require("./config/db");
 const Item = require("./models/itemModel");
+const Movie = require("./models/movieModel")
 
 const app = express();
 
@@ -13,6 +14,31 @@ const PORT = 3000;
 // Step 3: Parses them into a JavaScript object.
 // Step 4: Attaches the result to req.body.
 app.use(express.json());
+
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url} - ${new Date().toISOString()}`);
+  next();
+});
+
+function validateItem(req, res, next) {
+  const { name } = req.body;
+  if (!name) {
+    return res.status(400).json({
+      success: false,
+      message: "Item name is missing",
+    });
+  }
+  next();
+}
+
+app.post("/test-movie", async (req, res) => {
+  try {
+    const movie = await Movie.create(req.body);
+    res.status(201).json({ success: true, data: movie });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+});
 
 app.get("/health", (req, res) => {
   res.status(200).json({
@@ -37,15 +63,9 @@ app.get("/items", async (req, res) => {
   }
 });
 
-app.post("/items/add", async (req, res) => {
+app.post("/items/add",validateItem, async (req, res) => {
   try {
     const { name } = req.body;
-    if (!name) {
-      return res.status(400).json({
-        success: false,
-        message: "Item name is missing",
-      });
-    }
     const newItem = await Item.create({ name });
     res.status(201).json({
       success: true,
