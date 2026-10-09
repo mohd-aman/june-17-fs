@@ -5,11 +5,12 @@ const {
   updateItem,
   deleteItem,
 } = require("../controllers/itemController");
+const {validateItem} = require('../middleware/common')
 
 const router = express.Router();
 
 router.get("/", getAllItems);
-router.post("/add", createItem);
+router.post("/add",validateItem ,createItem);
 router.put("/:id", updateItem);
 router.delete("/:id", deleteItem);
 
