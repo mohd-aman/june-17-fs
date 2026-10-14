@@ -93,7 +93,7 @@ const login = async (req,res)=>{
     })
 
   }catch(err){
-    res.json(500).json({
+    res.status(500).json({
       success:false,
       message:"Oops, Something went wrong"
     })
