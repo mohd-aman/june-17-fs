@@ -57,7 +57,7 @@ const login = async (req,res)=>{
     const {email,password} = req.body;
     //validate email and password
     if(!email || !password){
-      return res.json(400).json({
+      return res.status(400).json({
         success:false,
         message:"Email and Password are required"
       })
