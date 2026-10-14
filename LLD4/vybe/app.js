@@ -1,4 +1,5 @@
 const express = require("express");
+const authRouter = require('./routes/authRoutes')
 
 const app = express();
 
@@ -22,6 +23,8 @@ app.get("/health", (req, res) => {
     message: "Server is Healthy",
   });
 });
+
+app.use("/api/auth",authRouter);
 
 app.use((req, res) => {
   res.status(404).json({
