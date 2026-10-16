@@ -83,7 +83,7 @@ const login = async (req, res) => {
 
     const token = jwt.sign(
       {
-        user: user._id,
+        userId: user._id,
         email: user.email,
         role: user.role,
       },
@@ -111,7 +111,32 @@ const login = async (req, res) => {
   }
 };
 
+const getCurrentUser = async (req,res)=>{
+  try{
+    console.log(req.user);
+    const user = await User.findById(req.user.userId).select("-password");
+    if(!user){
+      return res.status(401).json({
+        success:false,
+        message:"User not found"
+      })
+    }
+    res.status(200).json({
+      success:true,
+      message:"User fetched successfully",
+      data:user
+    })
+  }
+  catch(err){
+    res.status(500).json({
+      success:false,
+      message:"Something went wrong"
+    })
+  }
+}
+
 module.exports = {
   register,
   login,
+  getCurrentUser
 };
