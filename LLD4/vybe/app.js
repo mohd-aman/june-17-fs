@@ -1,5 +1,6 @@
 const express = require("express");
-const authRouter = require('./routes/authRoutes')
+const authRouter = require('./routes/authRoutes');
+const { authMiddleware, authorizationRoles } = require("./middleware/authMiddleware");
 
 const app = express();
 
@@ -17,7 +18,7 @@ app.use((req, res, next) => {
 });
 
 //health check
-app.get("/health", (req, res) => {
+app.get("/health",(req, res) => {
   res.status(200).json({
     success: true,
     message: "Server is Healthy",
@@ -25,6 +26,22 @@ app.get("/health", (req, res) => {
 });
 
 app.use("/api/auth",authRouter);
+
+//protected
+app.get("/test-protected",authMiddleware,(req,res)=>{
+  res.status(200).json({
+    success:true,
+    message:"You have access to this protected route",
+    user:req.user
+  })
+})
+
+app.post("/movie",authMiddleware,authorizationRoles('user'),(req,res)=>{
+  res.json({
+    success:true,
+    message:"you are authenticated as well as authorized to perform action"
+  })
+})
 
 app.use((req, res) => {
   res.status(404).json({
