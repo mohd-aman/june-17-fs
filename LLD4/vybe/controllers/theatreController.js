@@ -25,7 +25,7 @@ const createTheatre = async (req, res) => {
 
 const getAllTheatres = async (req, res) => {
   try {
-    const theatres = await Theatre.find();
+    const theatres = await Theatre.find().populate("owner", "name email");
 
     res.status(200).json({
       success: true,
@@ -42,7 +42,7 @@ const getAllTheatres = async (req, res) => {
 
 const getTheatreById = async (req, res) => {
   try {
-    const theatre = await Theatre.findById(req.params.id);
+    const theatre = await Theatre.findById(req.params.id).populate("owner", "name email");
 
     if (!theatre) {
       return res.status(404).json({

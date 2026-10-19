@@ -1,7 +1,8 @@
 const express = require("express");
 const authRouter = require('./routes/authRoutes');
 const movieRouter = require('./routes/movieRoutes');
-const theatreRouter = require('./routes/theatreRoutes')
+const theatreRouter = require('./routes/theatreRoutes');
+const showRouter = require("./routes/showRoutes");
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.get("/health",(req, res) => {
 app.use("/api/auth",authRouter);
 app.use("/movies",movieRouter);
 app.use("/theatres",theatreRouter)
+app.use("/shows",showRouter);
 
 app.use((req, res) => {
   res.status(404).json({
