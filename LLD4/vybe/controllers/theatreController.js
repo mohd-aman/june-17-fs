@@ -14,7 +14,9 @@ const createTheatre = async (req, res) => {
     });
   } catch (err) {
     const isValidationError =
-      err.name === "ValidationError" || err.name === "CastError" || err.code === 11000;
+      err.name === "ValidationError" ||
+      err.name === "CastError" ||
+      err.code === 11000;
 
     res.status(isValidationError ? 400 : 500).json({
       success: false,
@@ -42,7 +44,10 @@ const getAllTheatres = async (req, res) => {
 
 const getTheatreById = async (req, res) => {
   try {
-    const theatre = await Theatre.findById(req.params.id).populate("owner", "name email");
+    const theatre = await Theatre.findById(req.params.id).populate(
+      "owner",
+      "name email",
+    );
 
     if (!theatre) {
       return res.status(404).json({
@@ -93,10 +98,14 @@ const updateTheatre = async (req, res) => {
       }
     }
 
-    const updatedTheatre = await Theatre.findByIdAndUpdate(req.params.id, updates, {
-      new: true,
-      runValidators: true,
-    });
+    const updatedTheatre = await Theatre.findByIdAndUpdate(
+      req.params.id,
+      updates,
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
 
     res.status(200).json({
       success: true,
@@ -105,7 +114,9 @@ const updateTheatre = async (req, res) => {
     });
   } catch (err) {
     const isValidationError =
-      err.name === "ValidationError" || err.name === "CastError" || err.code === 11000;
+      err.name === "ValidationError" ||
+      err.name === "CastError" ||
+      err.code === 11000;
 
     res.status(isValidationError ? 400 : 500).json({
       success: false,
@@ -149,10 +160,101 @@ const deleteTheatre = async (req, res) => {
   }
 };
 
+// Get all theatres for admin (with optional status filter)
+const getAllTheatresAdmin = async (req, res) => {
+  try {
+    const filter = {};
+    if (req.query.status === "pending") {
+      filter.isActive = false;
+    } else if (req.query.status === "active") {
+      filter.isActive = true;
+    }
+    // If no status query param, filter is empty = return all
+    const theatres = await Theatre.find(filter).populate("owner", "name email");
+    res.status(200).json({
+      success: true,
+      message: "Theatres fetched successfully",
+      data: theatres,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Oops, Something went wrong",
+    });
+  }
+};
+
+const approveTheatre = async (req, res) => {
+  try {
+    const theatre = await Theatre.findById(req.params.id);
+    if (!theatre) {
+      return res.status(404).json({
+        success: false,
+        message: "Theatre not found",
+      });
+    }
+    if (theatre.isActive) {
+      return res.status(400).json({
+        success: false,
+        message: "Theatre is already approved",
+      });
+    }
+    theatre.isActive = true; //it is locally not saved in db
+    await theatre.save();
+    res.status(200).json({
+      success: true,
+      message: "Theatre approved successfully",
+      data: theatre,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    });
+  }
+};
+
+const rejectTheatre = async (req, res) => {
+  try {
+    const theatre = await Theatre.findById(req.params.id);
+
+    if (!theatre) {
+      return res.status(404).json({
+        success: false,
+        message: "Theatre not found",
+      });
+    }
+
+    if (!theatre.isActive) {
+      return res.status(400).json({
+        success: false,
+        message: "Theatre is already inactive or has not been approved",
+      });
+    }
+
+    theatre.isActive = false;
+    await theatre.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Theatre rejected successfully",
+      data: theatre,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    });
+  }
+};
+
 module.exports = {
   createTheatre,
   getAllTheatres,
   getTheatreById,
   updateTheatre,
   deleteTheatre,
+  approveTheatre,
+  rejectTheatre,
+  getAllTheatresAdmin
 };

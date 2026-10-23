@@ -3,6 +3,7 @@ const authRouter = require('./routes/authRoutes');
 const movieRouter = require('./routes/movieRoutes');
 const theatreRouter = require('./routes/theatreRoutes');
 const showRouter = require("./routes/showRoutes");
+const adminRouter = require("./routes/adminRoutes");
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.get("/health",(req, res) => {
 });
 
 app.use("/api/auth",authRouter);
+app.use("/api/admin",adminRouter)
 app.use("/movies",movieRouter);
 app.use("/theatres",theatreRouter)
 app.use("/shows",showRouter);
