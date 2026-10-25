@@ -27,7 +27,7 @@ const createTheatre = async (req, res) => {
 
 const getAllTheatres = async (req, res) => {
   try {
-    const theatres = await Theatre.find().populate("owner", "name email");
+    const theatres = await Theatre.find({isActive:true}).populate("owner", "name email");
 
     res.status(200).json({
       success: true,
@@ -248,6 +248,28 @@ const rejectTheatre = async (req, res) => {
   }
 };
 
+const getAllTheatreByOwner = async(req,res)=>{
+  try{
+    const filter = {owner:req.user.userId}
+    if(req.query.status === 'pending'){
+      filter.isActive = false;
+    }else if(req.query.status === "active"){
+      filter.isActive = true;
+    }
+    const theatres = await Theatre.find(filter);
+    res.status(200).json({
+      success: true,
+      message: "Theatres fetched successfully",
+      data: theatres,
+    });
+  }catch(err){
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    });
+  }
+}
+
 module.exports = {
   createTheatre,
   getAllTheatres,
@@ -256,5 +278,6 @@ module.exports = {
   deleteTheatre,
   approveTheatre,
   rejectTheatre,
-  getAllTheatresAdmin
+  getAllTheatresAdmin,
+  getAllTheatreByOwner
 };

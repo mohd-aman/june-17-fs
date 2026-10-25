@@ -5,6 +5,7 @@ const {
   createTheatre,
   updateTheatre,
   deleteTheatre,
+  getAllTheatreByOwner,
 } = require("../controllers/theatreController");
 const {
   authMiddleware,
@@ -18,6 +19,8 @@ router.get("/", getAllTheatres);
 router.get("/:id", getTheatreById);
 
 //protected route partner only
+
+router.get("/my/theatres",authMiddleware,authorizationRoles("partner"),getAllTheatreByOwner)
 router.post("/", authMiddleware, authorizationRoles("partner"), createTheatre);
 router.put(
   "/:id",

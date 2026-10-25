@@ -7,6 +7,7 @@ const {
   createShow,
   updateShow,
   deleteShow,
+  getShowsByOwner,
 } = require("../controllers/showController");
 const {
   authMiddleware,
@@ -22,6 +23,7 @@ router.get("/theatre/:theatreId", getShowsByTheatre);
 router.get("/movie/:movieId", getShowsByMovie);
 
 //partner protected routes
+router.get("/my/shows",authMiddleware,authorizationRoles("partner"),getShowsByOwner)
 router.post("/", authMiddleware, authorizationRoles("partner"), createShow);
 router.put("/:id", authMiddleware, authorizationRoles("partner"), updateShow);
 router.delete(

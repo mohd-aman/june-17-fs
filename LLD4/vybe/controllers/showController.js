@@ -71,9 +71,7 @@ const createShow = async (req, res) => {
 
 const getAllShows = async (req, res) => {
   try {
-    const shows = await Show.find()
-                        .populate("movie")
-                        .populate("theatre");
+    const shows = await Show.find({isActive:true}).populate("movie").populate("theatre");
 
     res.status(200).json({
       success: true,
@@ -110,7 +108,7 @@ const getShowById = async (req, res) => {
 
 const getShowsByTheatre = async (req, res) => {
   try {
-    const shows = await Show.find({ theatre: req.params.theatreId })
+    const shows = await Show.find({ theatre: req.params.theatreId, isActive:true})
       .populate("movie")
       .populate("theatre");
 
@@ -126,7 +124,7 @@ const getShowsByTheatre = async (req, res) => {
 
 const getShowsByMovie = async (req, res) => {
   try {
-    const shows = await Show.find({ movie: req.params.movieId })
+    const shows = await Show.find({ movie: req.params.movieId,isActive:true })
       .populate("movie")
       .populate("theatre");
 
@@ -268,6 +266,130 @@ const deleteShow = async (req, res) => {
   }
 };
 
+const getAllShowsAdmin = async (req, res) => {
+  try {
+    const filter = {};
+    if (req.query.status === "pending") {
+      filter.isActive = false;
+    } else if (req.query.status === "active") {
+      filter.isActive = true;
+    }
+    const shows = await Show.find(filter)
+      .populate("movie", "title genre language")
+      .populate("theatre", "name address");
+    res.status(200).json({
+      success: true,
+      message: "Shows fetched successfully",
+      data: shows,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    });
+  }
+};
+
+const approveShow = async(req,res)=>{
+  try{
+    const show = await Show.findById(req.params.id);
+
+    if (!show) {
+      return res.status(404).json({
+        success: false,
+        message: "Show not found",
+      });
+    }
+
+    if (show.isActive) {
+      return res.status(400).json({
+        success: false,
+        message: "Show is already approved",
+      });
+    }
+
+    show.isActive = true; //locally change
+    await show.save(); //save it to db
+
+    res.status(200).json({
+      success: true,
+      message: "Show approved successfully",
+      data: show,
+    });
+
+  }catch(err){
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    });
+  }
+}
+
+const rejectShow = async (req, res) => {
+  try {
+    const show = await Show.findById(req.params.id);
+
+    if (!show) {
+      return res.status(404).json({
+        success: false,
+        message: "Show not found",
+      });
+    }
+
+    if (!show.isActive) {
+      return res.status(400).json({
+        success: false,
+        message: "Show is already inactive",
+      });
+    }
+
+    show.isActive = false;
+    await show.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Show rejected successfully",
+      data: show,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    });
+  }
+};
+
+const getShowsByOwner = async(req,res)=>{
+  try{
+    //step1 :find all theatres of owned by this partner
+    const theatres = await Theatre.find({owner:req.user.userId});
+    const thearedIds = theatres.map((t)=>t._id);
+
+    //steps 2: find all shows at these theatres;
+    // theatreIds = [id1,id2,id3,id4..];
+    const filter = {theatre:{$in:thearedIds}};
+
+    if (req.query.status === "pending") {
+      filter.isActive = false;
+    } else if (req.query.status === "active") {
+      filter.isActive = true;
+    }
+    console.log(filter);
+    const shows = await Show.find(filter) .populate("movie", "title genre language")
+      .populate("theatre", "name address");
+
+    res.status(200).json({
+      success: true,
+      message: "Shows fetched successfully",
+      data: shows,
+    });
+  }catch(err){
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    });
+  }
+}
 module.exports = {
   createShow,
   getAllShows,
@@ -276,4 +398,8 @@ module.exports = {
   getShowsByMovie,
   updateShow,
   deleteShow,
+  getAllShowsAdmin,
+  approveShow,
+  rejectShow,
+  getShowsByOwner
 };
