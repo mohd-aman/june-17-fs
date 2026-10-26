@@ -374,7 +374,6 @@ const getShowsByOwner = async(req,res)=>{
     } else if (req.query.status === "active") {
       filter.isActive = true;
     }
-    console.log(filter);
     const shows = await Show.find(filter) .populate("movie", "title genre language")
       .populate("theatre", "name address");
 
