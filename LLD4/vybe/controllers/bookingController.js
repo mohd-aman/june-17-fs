@@ -161,4 +161,30 @@ const confirmBooking = async (req, res) => {
   }
 };
 
-module.exports = { createBooking, cancelBooking, confirmBooking };
+const getBookingByUser = async (req,res)=>{
+  try{
+    const booking = await Booking.find({user:req.user.userId}).populate({
+      path:"show",
+      populate:[
+        {path:"movie", select:"title genre language poster"},
+        {path:"theatre",select:"name address"}
+      ],
+      select:"movie theatre date time ticketPrice"
+    })
+    .sort({createdAt:-1}); // newest first, {createdAt:1} - it means oldest first. 
+
+    res.status(200).json({
+      success:true,
+      message:"Booking fetched successfully",
+      data:booking
+    })
+
+  }catch(err){
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    });
+  }
+}
+
+module.exports = { createBooking, cancelBooking, confirmBooking, getBookingByUser };

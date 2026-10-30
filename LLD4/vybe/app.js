@@ -4,7 +4,8 @@ const movieRouter = require('./routes/movieRoutes');
 const theatreRouter = require('./routes/theatreRoutes');
 const showRouter = require("./routes/showRoutes");
 const adminRouter = require("./routes/adminRoutes");
-const bookingrouter = require("./routes/bookingRoutes")
+const bookingrouter = require("./routes/bookingRoutes");
+const aiRouter = require("./routes/aiRoutes")
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.get("/health",(req, res) => {
 app.use("/api/auth",authRouter);
 app.use("/api/admin",adminRouter);
 app.use("/api/bookings",bookingrouter);
+app.use("/api/ai",aiRouter);
 app.use("/movies",movieRouter);
 app.use("/theatres",theatreRouter)
 app.use("/shows",showRouter);
