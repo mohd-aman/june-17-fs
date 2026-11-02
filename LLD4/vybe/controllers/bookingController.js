@@ -1,3 +1,4 @@
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const Booking = require("../models/bookingModel");
 const Show = require("../models/showModel");
 
@@ -103,6 +104,24 @@ const cancelBooking = async (req, res) => {
       });
     }
 
+    if (booking.stripePaymentIntentId) {
+      const paymentIntent = await stripe.paymentIntents.retrieve(
+        booking.stripePaymentIntentId,
+      );
+      if (paymentIntent.status === "succeeded") {
+        await stripe.refunds.create({
+          payment_intent: booking.stripePaymentIntentId,
+        });
+      } else if (paymentIntent.status === "processing") {
+        return res.status(400).json({
+          success: false,
+          message: "Payment is still processing. Please try again shortly.",
+        });
+      } else if (paymentIntent.status !== "canceled") {
+        await stripe.paymentIntents.cancel(booking.stripePaymentIntentId);
+      }
+    }
+
     //restore the seats in shows
     await Show.findByIdAndUpdate(booking.show, {
       $inc: { availableSeats: booking.seats },
@@ -161,30 +180,95 @@ const confirmBooking = async (req, res) => {
   }
 };
 
-const getBookingByUser = async (req,res)=>{
-  try{
-    const booking = await Booking.find({user:req.user.userId}).populate({
-      path:"show",
-      populate:[
-        {path:"movie", select:"title genre language poster"},
-        {path:"theatre",select:"name address"}
-      ],
-      select:"movie theatre date time ticketPrice"
-    })
-    .sort({createdAt:-1}); // newest first, {createdAt:1} - it means oldest first. 
+const getBookingByUser = async (req, res) => {
+  try {
+    const booking = await Booking.find({ user: req.user.userId })
+      .populate({
+        path: "show",
+        populate: [
+          { path: "movie", select: "title genre language poster" },
+          { path: "theatre", select: "name address" },
+        ],
+        select: "movie theatre date time ticketPrice",
+      })
+      .sort({ createdAt: -1 }); // newest first, {createdAt:1} - it means oldest first.
 
     res.status(200).json({
-      success:true,
-      message:"Booking fetched successfully",
-      data:booking
-    })
-
-  }catch(err){
+      success: true,
+      message: "Booking fetched successfully",
+      data: booking,
+    });
+  } catch (err) {
     res.status(500).json({
       success: false,
       message: "Something went wrong",
     });
   }
-}
+};
 
-module.exports = { createBooking, cancelBooking, confirmBooking, getBookingByUser };
+const getTicket = async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id)
+      .populate({
+        path: "show",
+        populate: [
+          { path: "movie", select: "title genre language poster" },
+          { path: "theatre", select: "name address" },
+        ],
+      })
+      .populate("user", "name email");
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found",
+      });
+    }
+
+    if (booking.user._id.toString() !== req.user.userId) {
+      return res.status(403).json({
+        success: false,
+        message: "You can only view your own tickets",
+      });
+    }
+
+    if (booking.status !== "confirmed") {
+      return res.status(400).json({
+        success: false,
+        message: "Ticket is only available for confirmed bookings",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Ticket generated",
+      data: {
+        bookingId: booking._id,
+        movie: booking.show.movie.title,
+        genre: booking.show.movie.genre,
+        language: booking.show.movie.language,
+        theatre: booking.show.theatre.name,
+        address: booking.show.theatre.address,
+        showDate: booking.show.date,
+        showTime: booking.show.time,
+        seats: booking.seats,
+        totalPrice: booking.totalPrice,
+        userName: booking.user.name,
+        userEmail: booking.user.email,
+        status: booking.status,
+      },
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to generate ticket",
+    });
+  }
+};
+
+module.exports = {
+  createBooking,
+  cancelBooking,
+  confirmBooking,
+  getBookingByUser,
+  getTicket
+};
