@@ -10,6 +10,8 @@ import ShowSelection from "./pages/ShowSelection";
 import Checkout from "./pages/Checkout";
 import Ticket from "./pages/Ticket";
 import MyBookings from "./pages/MyBookings";
+import ForgotPassword from "./pages/ForgetPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 const App = () => {
   return (
@@ -20,6 +22,8 @@ const App = () => {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/forget-password" element={<ForgotPassword/>} />
+            <Route path="/reset-password/:token" element={<ResetPassword/>}/>
             <Route path="/movies" element={<Movies />} />
             <Route path="/movies/:id" element={<MovieDetail />} />
             <Route
