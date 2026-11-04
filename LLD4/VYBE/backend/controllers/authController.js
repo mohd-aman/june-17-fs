@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto")
 
 const User = require("../models/userModel");
 
@@ -111,6 +112,81 @@ const login = async (req, res) => {
   }
 };
 
+const forgetPassword = async (req,res)=>{
+  try{
+    const {email} = req.body;
+    const user = await User.findOne({email});
+    if(!user){
+      res.status(400).json({
+        success:false,
+        message:"user with the email does not exist"
+      })
+    }
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    console.log(resetToken);
+    user.resetPasswordToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+    user.resetPasswordExpiry = Date.now() + 15 * 60 * 1000;
+    await user.save();
+    const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
+    console.log(resetUrl);
+    //todo send email to the user.
+    return res.status(200).json({
+      success: true,
+      message: "Password reset email sent",
+    });
+  }catch(err){
+    console.log(err);
+    return res.status(500).json({
+      success:false,
+      message:"Oops something went wrong"
+    })
+  }
+}
+
+const resetPassword = async (req,res)=>{
+  try{
+    const { token } = req.params;
+    const { password } = req.body;
+    if (!password || typeof password !== "string" || password.trim().length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 8 characters",
+      });
+    }
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+    
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpiry: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or expired reset token",
+      });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    user.password = hashedPassword;
+    user.resetPasswordToken = null;
+    user.resetPasswordExpiry = null;
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Password reset successful",
+    });
+  }catch(err){
+
+  }
+}
+
 const getCurrentUser = async (req,res)=>{
   try{
     console.log(req.user);
@@ -138,5 +214,7 @@ const getCurrentUser = async (req,res)=>{
 module.exports = {
   register,
   login,
-  getCurrentUser
+  getCurrentUser,
+  forgetPassword,
+  resetPassword
 };
