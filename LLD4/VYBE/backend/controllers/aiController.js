@@ -1,4 +1,4 @@
-const Groq = require("groq-sdk");
+const Groq = require("groq-sdk/index.js");
 const Show = require("../models/showModel");
 const Movie = require("../models/movieModel");
 const Booking = require("../models/bookingModel");

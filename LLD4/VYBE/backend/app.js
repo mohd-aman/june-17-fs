@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const authRouter = require('./routes/authRoutes');
 const movieRouter = require('./routes/movieRoutes');
 const theatreRouter = require('./routes/theatreRoutes');
@@ -9,6 +10,7 @@ const aiRouter = require("./routes/aiRoutes");
 const paymentRouter = require("./routes/paymentRoutes")
 
 const app = express();
+app.use(cors());
 
 //Apply this middleware to every incoming request,
 // express.json() is a built-in middleware that:
