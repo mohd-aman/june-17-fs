@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { homeFor } from "../utils/roleHome";
+
 import api from "../services/api";
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -13,7 +15,7 @@ const Login = () => {
     try {
       const response = await api.post("/api/auth/login", { email, password });
       login(response.data.data, response.data.token);
-      navigate("/movies");
+      navigate(homeFor(response.data.data.role));
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
     }

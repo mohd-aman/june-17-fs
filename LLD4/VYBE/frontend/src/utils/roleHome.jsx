@@ -1,0 +1,1 @@
+export const homeFor = (role) => ({ admin: "/admin", partner: "/partner" }[role] || "/movies");

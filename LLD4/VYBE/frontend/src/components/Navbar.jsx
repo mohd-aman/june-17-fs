@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { homeFor } from "../utils/roleHome";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -30,6 +31,14 @@ const Navbar = () => {
             >
               My Bookings
             </Link>
+            {user.role !== "user" && (
+              <Link
+                to={homeFor(user.role)}
+                className="text-zinc-400 hover:text-violet-400 transition-colors capitalize"
+              >
+                {user.role}
+              </Link>
+            )}
             <span className="text-zinc-500 text-sm">{user.name}</span>
             <button
               onClick={handleLogout}
