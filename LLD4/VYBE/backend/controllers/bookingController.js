@@ -1,6 +1,7 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const Booking = require("../models/bookingModel");
 const Show = require("../models/showModel");
+const {emitSeatUpdate} = require("../socket")
 
 const createBooking = async (req, res) => {
   try {
@@ -43,7 +44,7 @@ const createBooking = async (req, res) => {
     const updatedShow = await Show.findOneAndUpdate(
       { _id: showId, availableSeats: { $gte: seats } },
       {
-        $inc: { seats: -seats },
+        $inc: { availableSeats: -seats },
       },
       { new: true },
     );
@@ -54,6 +55,8 @@ const createBooking = async (req, res) => {
         message: "Not enough seats available",
       });
     }
+
+    emitSeatUpdate(updatedShow);
 
     //calculate total price
     const totalPrice = show.ticketPrice * seats;
@@ -123,9 +126,11 @@ const cancelBooking = async (req, res) => {
     }
 
     //restore the seats in shows
-    await Show.findByIdAndUpdate(booking.show, {
+    const restoredShow = await Show.findByIdAndUpdate(booking.show, {
       $inc: { availableSeats: booking.seats },
     });
+
+    emitSeatUpdate(restoredShow);
 
     //update the status
     booking.status = "cancelled";

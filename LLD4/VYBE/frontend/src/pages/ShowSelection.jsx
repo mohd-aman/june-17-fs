@@ -13,19 +13,25 @@ const ShowSelection = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const onConnect = () => console.log("Connected:", socket.id);
-    const onWelcome = (message) => console.log("Server says:", message);
+    const joinShow = () => socket.emit("join-show", id);
 
-    socket.on("connect", onConnect);
-    socket.on("welcome", onWelcome);
-    socket.connect();
+    const onSeatUpdate = ({ availableSeats }) => {
+      setShow((prev) => (prev ? { ...prev, availableSeats } : prev));
+      setSeats((n) => Math.max(1, Math.min(n, availableSeats)));
+    };
+
+    socket.on("connect", joinShow);
+    socket.on("seat-update", onSeatUpdate);
+
+    if (socket.connected) joinShow();
+    else socket.connect();
 
     return () => {
-      socket.off("connect", onConnect);
-      socket.off("welcome", onWelcome);
-      socket.disconnect();
+      socket.emit("leave-show", id);
+      socket.off("connect", joinShow);
+      socket.off("seat-update", onSeatUpdate);
     };
-  }, []);
+  }, [id]);
 
   useEffect(() => {
     const fetchShow = async () => {
