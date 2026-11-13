@@ -128,7 +128,8 @@ const forgetPassword = async (req,res)=>{
     user.resetPasswordToken = crypto.createHash("sha256").update(resetToken).digest("hex");
     user.resetPasswordExpiry = Date.now() + 15 * 60 * 1000;
     await user.save();
-    const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
+    const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+    const resetUrl = `${clientUrl}/reset-password/${resetToken}`;
     console.log(resetUrl);
     //todo send email to the user.
     return res.status(200).json({

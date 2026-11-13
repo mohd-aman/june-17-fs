@@ -175,7 +175,7 @@ const verifyPayment = async (req, res) => {
  
     const user = await User.findById(booking.user);
  
-    await sendEmail({
+    sendEmail({
       to: user.email,
       subject: "VYBE - Booking Confirmed!",
       html: `
