@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
+import Recommendations from "../components/Recommendations";
 
 const badge = {
   confirmed: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
@@ -74,6 +75,7 @@ const MyBookings = () => {
   if (bookings.length === 0) {
     return (
       <div className="max-w-3xl mx-auto px-6 py-16 text-center">
+        <Recommendations />
         <p className="text-zinc-400 mb-4">You have no bookings yet.</p>
         <Link
           to="/movies"
@@ -88,6 +90,7 @@ const MyBookings = () => {
     <div className="max-w-3xl mx-auto px-6 py-8">
       <h1 className="text-3xl font-bold text-white mb-6">My Bookings</h1>
       {cancelError && <p className="text-red-400 mb-4">{cancelError}</p>}
+       <Recommendations />
       <div className="space-y-4">
         {bookings.map((b) => (
           <div
