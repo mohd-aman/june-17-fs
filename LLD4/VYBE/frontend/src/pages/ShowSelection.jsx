@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
+import socket from "../services/socket";
+
 const ShowSelection = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -9,6 +11,22 @@ const ShowSelection = () => {
   const [loading, setLoading] = useState(true);
   const [booking, setBooking] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const onConnect = () => console.log("Connected:", socket.id);
+    const onWelcome = (message) => console.log("Server says:", message);
+
+    socket.on("connect", onConnect);
+    socket.on("welcome", onWelcome);
+    socket.connect();
+
+    return () => {
+      socket.off("connect", onConnect);
+      socket.off("welcome", onWelcome);
+      socket.disconnect();
+    };
+  }, []);
+
   useEffect(() => {
     const fetchShow = async () => {
       try {
@@ -23,7 +41,7 @@ const ShowSelection = () => {
     fetchShow();
   }, [id]);
 
-    const handleBooking = async () => {
+  const handleBooking = async () => {
     setBooking(true);
     setError("");
     try {
@@ -40,7 +58,7 @@ const ShowSelection = () => {
     }
   };
 
-    if (loading) {
+  if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[50vh]">
         <p className="text-zinc-500">Loading show details...</p>
@@ -55,7 +73,7 @@ const ShowSelection = () => {
     );
   }
 
-    return (
+  return (
     <div className="max-w-2xl mx-auto px-6 py-8">
       <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-8">
         <h1 className="text-2xl font-bold text-white mb-2">

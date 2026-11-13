@@ -21,6 +21,7 @@
     "mongoose": "^9.11.1",
     "nodemailer": "^10.5.0",
     "nodemon": "^3.1.14",
+    "socket.io": "^4.8.4",
     "stripe": "^23.1.0"
   }
 }
