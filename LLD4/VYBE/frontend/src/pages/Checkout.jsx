@@ -32,6 +32,7 @@ const PaymentForm = ({ bookingId }) => {
       return;
     }
     if (paymentIntent && paymentIntent.status === "succeeded") {
+      console.log(paymentIntent)
       try {
         await api.post("/api/payments/verify-payment", {
           paymentIntentId: paymentIntent.id,
