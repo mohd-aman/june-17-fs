@@ -8,6 +8,8 @@ const adminRouter = require("./routes/adminRoutes");
 const bookingrouter = require("./routes/bookingRoutes");
 const aiRouter = require("./routes/aiRoutes");
 const paymentRouter = require("./routes/paymentRoutes")
+const { notFound, errorHandler } = require("./middleware/errorHandler");
+
 
 const app = express();
 app.use(
@@ -46,11 +48,7 @@ app.use("/movies",movieRouter);
 app.use("/theatres",theatreRouter)
 app.use("/shows",showRouter);
 
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: "Route not found",
-  });
-});
+app.use(notFound);
+app.use(errorHandler);
 
 module.exports = app;
