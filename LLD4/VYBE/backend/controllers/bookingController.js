@@ -29,6 +29,10 @@ const createBooking = asyncHandler(async (req, res) => {
     throw new AppError("This show is not currently available for booking", 400);
   }
 
+  if(seats>10){
+    throw new AppError("You can book at max 10 seats at a time", 400); 
+  }
+
   //step 4 : Atomic seat check and decrement
   const updatedShow = await Show.findOneAndUpdate(
     { _id: showId, availableSeats: { $gte: seats } },
