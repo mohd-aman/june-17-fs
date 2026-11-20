@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const crypto = require("crypto")
+const crypto = require("crypto");
 
 const User = require("../models/userModel");
 
@@ -30,7 +30,7 @@ const register = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      role:role === 'partner' ? 'partner' : 'user'
+      role: role === "partner" ? "partner" : "user",
     });
 
     console.log(newUser);
@@ -103,7 +103,7 @@ const login = async (req, res) => {
         email: user.email,
         role: user.role,
       },
-      token
+      token,
     });
   } catch (err) {
     res.status(500).json({
@@ -113,53 +113,55 @@ const login = async (req, res) => {
   }
 };
 
-const forgetPassword = async (req,res)=>{
-  try{
-    const {email} = req.body;
-    const user = await User.findOne({email});
-    if(!user){
-      res.status(400).json({
-        success:false,
-        message:"user with the email does not exist"
-      })
+const forgetPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (user) {
+      const resetToken = crypto.randomBytes(32).toString("hex");
+      console.log(resetToken);
+      user.resetPasswordToken = crypto
+        .createHash("sha256")
+        .update(resetToken)
+        .digest("hex");
+      user.resetPasswordExpiry = Date.now() + 15 * 60 * 1000;
+      await user.save();
+      const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+      const resetUrl = `${clientUrl}/reset-password/${resetToken}`;
+      console.log(resetUrl);
+      //todo send email to the user.
+      
     }
-    const resetToken = crypto.randomBytes(32).toString("hex");
-    console.log(resetToken);
-    user.resetPasswordToken = crypto.createHash("sha256").update(resetToken).digest("hex");
-    user.resetPasswordExpiry = Date.now() + 15 * 60 * 1000;
-    await user.save();
-    const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
-    const resetUrl = `${clientUrl}/reset-password/${resetToken}`;
-    console.log(resetUrl);
-    //todo send email to the user.
     return res.status(200).json({
       success: true,
-      message: "Password reset email sent",
+      message:
+        "If an account exists for this email, we have sent a reset link.",
     });
-  }catch(err){
+  } catch (err) {
     console.log(err);
     return res.status(500).json({
-      success:false,
-      message:"Oops something went wrong"
-    })
+      success: false,
+      message: "Oops something went wrong",
+    });
   }
-}
+};
 
-const resetPassword = async (req,res)=>{
-  try{
+const resetPassword = async (req, res) => {
+  try {
     const { token } = req.params;
     const { password } = req.body;
-    if (!password || typeof password !== "string" || password.trim().length < 8) {
+    if (
+      !password ||
+      typeof password !== "string" ||
+      password.trim().length < 8
+    ) {
       return res.status(400).json({
         success: false,
         message: "Password must be at least 8 characters",
       });
     }
-    const hashedToken = crypto
-      .createHash("sha256")
-      .update(token)
-      .digest("hex");
-    
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
     const user = await User.findOne({
       resetPasswordToken: hashedToken,
       resetPasswordExpiry: { $gt: Date.now() },
@@ -184,39 +186,36 @@ const resetPassword = async (req,res)=>{
       success: true,
       message: "Password reset successful",
     });
-  }catch(err){
+  } catch (err) {}
+};
 
-  }
-}
-
-const getCurrentUser = async (req,res)=>{
-  try{
+const getCurrentUser = async (req, res) => {
+  try {
     console.log(req.user);
     const user = await User.findById(req.user.userId).select("-password");
-    if(!user){
+    if (!user) {
       return res.status(401).json({
-        success:false,
-        message:"User not found"
-      })
+        success: false,
+        message: "User not found",
+      });
     }
     res.status(200).json({
-      success:true,
-      message:"User fetched successfully",
-      data:user
-    })
-  }
-  catch(err){
+      success: true,
+      message: "User fetched successfully",
+      data: user,
+    });
+  } catch (err) {
     res.status(500).json({
-      success:false,
-      message:"Something went wrong"
-    })
+      success: false,
+      message: "Something went wrong",
+    });
   }
-}
+};
 
 module.exports = {
   register,
   login,
   getCurrentUser,
   forgetPassword,
-  resetPassword
+  resetPassword,
 };
