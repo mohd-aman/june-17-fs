@@ -8,7 +8,9 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "setupFilesAfterEnv": ["./tests/setup.js"]  
+    "setupFilesAfterEnv": [
+      "./tests/setup.js"
+    ]
   },
   "keywords": [],
   "author": "",
@@ -20,7 +22,9 @@
     "cors": "^2.8.6",
     "dotenv": "^18.0.7",
     "express": "^5.3.0",
+    "express-rate-limit": "^8.7.5",
     "groq-sdk": "^1.6.0",
+    "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.11.1",
     "nodemailer": "^10.5.0",

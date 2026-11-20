@@ -2,7 +2,6 @@ const os = require("os");
 const mongoose = require("mongoose");
 const { MongoMemoryServer } = require("mongodb-memory-server");
 
-
 // app.js loads every controller, and some read keys the moment they load.
 // Tests never call Groq or Stripe, so test values are enough.
 process.env.JWT_SECRET = "test-secret";

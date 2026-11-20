@@ -1,4 +1,5 @@
 const express = require("express");
+const helmet = require("helmet")
 const cors = require("cors");
 const authRouter = require('./routes/authRoutes');
 const movieRouter = require('./routes/movieRoutes');
@@ -12,6 +13,10 @@ const { notFound, errorHandler } = require("./middleware/errorHandler");
 
 
 const app = express();
+
+// On Render, requests reach us through one proxy: trust it to tell us the real client IP
+app.set("trust proxy", 1);
+
 app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:5173",
@@ -24,6 +29,7 @@ app.use(
 // Step 2: Reads the raw bytes.
 // Step 3: Parses them into a JavaScript object.
 // Step 4: Attaches the result to req.body.
+app.use(helmet());
 app.use(express.json());
 
 app.use((req, res, next) => {
