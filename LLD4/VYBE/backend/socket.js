@@ -5,6 +5,9 @@ let io;
 
 const roomFor = (showId) => `show:${showId}`;
 
+// How many sockets are in a room right now
+const viewersIn = (room) => io.sockets.adapter.rooms.get(room)?.size || 0;
+
 const initSocket = (server) => {
   io = new Server(server, {
     cors: { origin: process.env.CLIENT_URL || "http://localhost:5173" },
@@ -16,16 +19,25 @@ const initSocket = (server) => {
     socket.on("join-show", (showId) => {
       // Never trust the client: only real show ids may name a room
       if (!mongoose.isObjectIdOrHexString(showId)) return;
-      socket.join(roomFor(showId));
+      const room = roomFor(showId);
+      socket.join(room);
+      io.to(room).emit("viewers", viewersIn(room));
     });
 
     socket.on("leave-show", (showId) => {
       if (!mongoose.isObjectIdOrHexString(showId)) return;
-      socket.leave(roomFor(showId));
+      const room = roomFor(showId);
+      socket.leave(room);
+      io.to(room).emit("viewers", viewersIn(room));
     });
 
-    socket.on("disconnect", () => {
-      console.log("Client disconnected:", socket.id);
+    // "disconnecting" fires while the socket is still inside its rooms
+    socket.on("disconnecting", () => {
+      for (const room of socket.rooms) {
+        if (room.startsWith("show:")) {
+          socket.to(room).emit("viewers", viewersIn(room) - 1);
+        }
+      }
     });
   });
 };

@@ -11,6 +11,7 @@ const ShowSelection = () => {
   const [loading, setLoading] = useState(true);
   const [booking, setBooking] = useState(false);
   const [error, setError] = useState("");
+  const [viewers, setViewers] = useState(0);
 
   useEffect(() => {
     const joinShow = () => socket.emit("join-show", id);
@@ -20,8 +21,11 @@ const ShowSelection = () => {
       setSeats((n) => Math.max(1, Math.min(n, availableSeats)));
     };
 
+    const onViewers = (count) => setViewers(count);
+
     socket.on("connect", joinShow);
     socket.on("seat-update", onSeatUpdate);
+    socket.on("viewers", onViewers);
 
     if (socket.connected) joinShow();
     else socket.connect();
@@ -30,6 +34,7 @@ const ShowSelection = () => {
       socket.emit("leave-show", id);
       socket.off("connect", joinShow);
       socket.off("seat-update", onSeatUpdate);
+      socket.off("viewers", onViewers);
     };
   }, [id]);
 
@@ -114,6 +119,11 @@ const ShowSelection = () => {
           <p className="text-zinc-500 text-sm mb-2">
             {show.availableSeats} seats available
           </p>
+          {viewers > 0 && (
+            <p className="text-zinc-500 text-sm mb-2">
+              {viewers} {viewers === 1 ? "person" : "people"} viewing this show
+            </p>
+          )}
           <div className="flex items-center justify-between py-4 border-t border-zinc-800">
             <span className="text-zinc-400">Price per ticket</span>
             <span className="text-zinc-300">₹{show.ticketPrice}</span>
